@@ -68,89 +68,72 @@ def blit(dest, src, loc):
 def lin_sis_solve(im):
     import sympy as sym
 
-    # im = image[image_index, i+offset_i, j+offset_j]
+    # im = image[image_index, 0+offset_i, 0+offset_j]
 
     p = []
+    eqn = []
+
     for i in range(25):
         p.append(sym.symbols('p' + str(i)))
 
-    eqn = []
+    # Create index array helper
+    im_index_array = np.reshape(list(range(np.size(im))), (3, 3))
+    p_index_array = np.reshape(list(range(np.size(p))), (5, 5))
 
-    eqn.append(sym.Eq(p[0] + p[1] + p[2] + p[15] + p[16] + p[17],
-                      (im[0]-im[3])*9))
-    eqn.append(sym.Eq(p[6] + p[7] + p[8] - p[21] - p[22] - p[23],
-                      (im[3] - im[6])*9))
-    eqn.append(sym.Eq(p[0] + p[0] + p[1] + p[4] + p[5] + p[6] - p[14] - p[15]
-                      - p[16] - p[19] - p[20] - p[21], (im[0] - im[6])*9))
-    eqn.append(sym.Eq(p[1] + p[2] + p[3] - p[16] - p[17] - p[18],
-                      (im[1] - im[4])*9))
-    eqn.append(sym.Eq(p[6] + p[7] + p[8] - p[21] - p[22] - p[23],
-                      (im[4] - im[7])*9))
-    eqn.append(sym.Eq(p[1] + p[2] + p[3] + p[6] + p[7] + p[8] - p[16] - p[17]
-                      - p[18] - p[21] - p[22] - p[23], (im[1] - im[7])*9))
-    eqn.append(sym.Eq(p[2] + p[3] + p[4] - p[17] - p[18] - p[19],
-                      (im[2] - im[5])*9))
-    eqn.append(sym.Eq(p[7] + p[8] + p[9] - p[22] - p[23] - p[24],
-                      (im[5] - im[8])*9))
-    eqn.append(sym.Eq(p[2] + p[3] + p[4] + p[7] + p[8] + p[9] - p[17] - p[18]
-                      - p[19] - p[22] - p[23] - p[24], (im[2] - im[8])*9))
-    eqn.append(sym.Eq(p[0] + p[5] + p[10] - p[3] - p[8] - p[13],
-                      (im[0] - im[1])*9))
-    eqn.append(sym.Eq(p[1] + p[6] + p[11] - p[4] - p[9] - p[14],
-                      (im[1] - im[2])*9))
-    eqn.append(sym.Eq(p[0] + p[5] + p[10] + p[1] + p[6] + p[11] - p[3] - p[8]
-                      - p[13] - p[4] - p[9] - p[14], (im[0] - im[2])*9))
-    eqn.append(sym.Eq(p[5] + p[10] + p[15] - p[8] - p[13] - p[18],
-                      (im[3] - im[4])*9))
-    eqn.append(sym.Eq(p[6] + p[11] + p[16] - p[9] - p[14] - p[19],
-                      (im[4] - im[5])*9))
-    eqn.append(sym.Eq(p[5] + p[10] + p[15] + p[6] + p[11] + p[16] - p[8]
-                      - p[13] - p[18] - p[9] - p[14] - p[19],
-                      (im[3] - im[5])*9))
-    eqn.append(sym.Eq(p[0] + p[1] + p[2] + p[5] + p[10] - p[8] - p[13] - p[18]
-                      - p[17] - p[16], (im[0] - im[4])*9))
-    eqn.append(sym.Eq(p[1] + p[2] + p[3] + p[6] + p[11] - p[9] - p[14] - p[19]
-                      - p[18] - p[17], (im[1] - im[5])*9))
-    eqn.append(sym.Eq(p[5] + p[6] + p[7] + p[10] + p[15] - p[13] - p[18]
-                      - p[26] - p[22] - p[21], (im[3] - im[7])*9))
-    eqn.append(sym.Eq(p[6] + p[7] + p[8] + p[11] + p[16] - p[14] - p[19]
-                      - p[24] - p[23] - p[22], (im[4] - im[8])*9))
-    eqn.append(sym.Eq(p[0] + p[1] + p[2] + p[5] + p[10] + p[6] + p[11] - p[8]
-                      - p[13] - p[18] - p[17] - p[9] - p[14] - p[19],
-                      (im[0] - im[5])*9))
-    eqn.append(sym.Eq(p[10] + p[11] + p[15] + p[16] + p[20] + p[21] + p[22]
-                      - p[7] - p[8] - p[9] - p[13] - p[14] - p[18] - p[19],
-                      (im[6] - im[5])*9))
-    eqn.append(sym.Eq(p[5] + p[6] + p[10] + p[11] + p[15] + p[16] + p[17]
-                      - p[2] - p[3] - p[4] - p[8] - p[9] - p[13] - p[14],
-                      (im[3] - im[2])*9))
-    eqn.append(sym.Eq(p[5] + p[6] + p[7] + p[10] + p[11] + p[15] + p[16]
-                      - p[13] - p[14] - p[18] - p[19] - p[22] - p[23] - p[24],
-                      (im[3] - im[8])*9))
-    eqn.append(sym.Eq(p[0] + p[1] + p[2] + p[5] + p[6] + p[7] + p[10] + p[11]
-                      - p[13] - p[14] - p[17] - p[18] - p[19] - p[22] - p[23]
-                      - p[24], (im[0] - im[8])*9))
-    eqn.append(sym.Eq(p[10] + p[11] + p[15] + p[16] + p[17] + p[20] + p[21]
-                      + p[22] - p[2] - p[3] - p[4] - p[7] - p[8] - p[9] - p[13]
-                      - p[14], (im[6] - im[2])*9))
-    eqn.append(sym.Eq(p[0] + p[1] + p[2] + p[5] + p[6] + p[7] + p[10] + p[11]
-                      + p[12], im[0]*9))
-    eqn.append(sym.Eq(p[1] + p[2] + p[3] + p[6] + p[7] + p[8] + p[11] + p[12]
-                      + p[13], im[1]*9))
-    eqn.append(sym.Eq(p[2] + p[3] + p[4] + p[7] + p[8] + p[9] + p[12] + p[13]
-                      + p[14], im[2]*9))
-    eqn.append(sym.Eq(p[5] + p[6] + p[7] + p[10] + p[11] + p[12] + p[15]
-                      + p[16] + p[17], im[3]*9))
-    eqn.append(sym.Eq(p[6] + p[7] + p[8] + p[11] + p[12] + p[13] + p[16]
-                      + p[17] + p[18], im[4]*9))
-    eqn.append(sym.Eq(p[7] + p[8] + p[9] + p[12] + p[13] + p[14] + p[17]
-                      + p[17] + p[19], im[5]*9))  # Erro de valor repetido
-    eqn.append(sym.Eq(p[10] + p[11] + p[12] + p[15] + p[16] + p[17] + p[20]
-                      + p[21] + p[22], im[6]*9))
-    eqn.append(sym.Eq(p[11] + p[12] + p[13] + p[16] + p[17] + p[18] + p[21]
-                      + p[22] + p[23], im[7]*9))
-    eqn.append(sym.Eq(p[12] + p[13] + p[14] + p[17] + p[18] + p[19] + p[22]
-                      + p[23] + p[24], im[8]*9))
+    # Create list of unique image combinations
+    im_combinations = []
+    for i in range(num_images):
+        for j in range(num_images):
+            if str(np.sort((i, j))) not in im_combinations:
+                im_combinations.append(str(np.sort((i, j))))
+
+    eqn = []
+    for combination in im_combinations:
+
+        im_indexes = np.fromstring(combination[1:-1], sep=' ').astype(int)
+
+        # Recover im_indexes position in im_index_array
+        x, y = np.where(im_index_array == im_indexes[0])
+        positive_variable_indexes = []
+        for i in range(squared_size):
+            for j in range(squared_size):
+                positive_variable_indexes.append(p_index_array[x + i, y + j][0])
+
+        # Create the 
+        negative_variable_indexes = []
+
+        # if the indexes are the same the second list must be empty
+        if im_indexes[0] != im_indexes[1]:
+            x, y = np.where(im_index_array == im_indexes[1])
+            for i in range(squared_size):
+                for j in range(squared_size):
+                    negative_variable_indexes.append(p_index_array[x + i, y + j][0])
+
+        # Create list with unique values between variable lists
+        A = [i for i in positive_variable_indexes if i not in negative_variable_indexes]
+        B = [i for i in negative_variable_indexes if i not in positive_variable_indexes]
+
+        # Create the equation expression
+        for i in A:
+            if "expression" not in locals():
+                expression = sym.Add(p[i])
+            else:
+                expression = sym.Add(expression, p[i])
+
+        for i in B:
+            if "expression" not in locals():
+                expression = sym.Add(-p[i])
+            else:
+                expression = sym.Add(expression, -p[i])
+
+        if im_indexes[0] == im_indexes[1]:
+            result = (im[im_indexes[0]]*9)
+        else:
+            result = ((im[im_indexes[0]] - im[im_indexes[1]])*9)
+        eqn.append(sym.Eq(expression, result))
+        del(expression)
+
+    print(eqn)
 
     return sym.solve(eqn, p)
 

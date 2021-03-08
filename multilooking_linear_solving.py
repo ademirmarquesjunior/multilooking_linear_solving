@@ -7,6 +7,12 @@ Created on Wed Feb 17 15:47:16 2021
 
 
 import numpy as np
+import sympy as sym
+from sympy import *
+import rasterio as rt
+import math
+from os import listdir
+
 
 num_images = 9
 squared_size = int(np.sqrt(num_images))
@@ -66,19 +72,20 @@ def blit(dest, src, loc):
 
 
 def lin_sis_solve(im):
-    import sympy as sym
-
     # im = image[image_index, 0+offset_i, 0+offset_j]
+    # im  = np.zeros(num_images)
 
-    p = []
+    # p = []
     eqn = []
 
-    for i in range(25):
-        p.append(sym.symbols('p' + str(i)))
+    # for i in range(int(math.pow((squared_size + squared_size - 1), 2))):
+    #     p.append(sym.symbols('p' + str(i)))
+        
+    p = sym.symbols('p0:%d'%int(math.pow((squared_size + squared_size - 1), 2)))
 
     # Create index array helper
-    im_index_array = np.reshape(list(range(np.size(im))), (3, 3))
-    p_index_array = np.reshape(list(range(np.size(p))), (5, 5))
+    im_index_array = np.reshape(list(range(np.size(im))), (squared_size, squared_size))
+    p_index_array = np.reshape(list(range(np.size(p))), (squared_size + squared_size - 1, squared_size + squared_size -1))
 
     # Create list of unique image combinations
     im_combinations = []
@@ -87,7 +94,7 @@ def lin_sis_solve(im):
             if str(np.sort((i, j))) not in im_combinations:
                 im_combinations.append(str(np.sort((i, j))))
 
-    eqn = []
+    res = []
     for combination in im_combinations:
 
         im_indexes = np.fromstring(combination[1:-1], sep=' ').astype(int)
@@ -127,15 +134,17 @@ def lin_sis_solve(im):
                 expression = sym.Add(expression, -p[i])
 
         if im_indexes[0] == im_indexes[1]:
-            result = (im[im_indexes[0]]*9)
+            result = (im[im_indexes[0]]*num_images)
+            res.append(result)
         else:
-            result = ((im[im_indexes[0]] - im[im_indexes[1]])*9)
+            result = ((im[im_indexes[0]] - im[im_indexes[1]])*num_images)
+            res.append(result)
         eqn.append(sym.Eq(expression, result))
         del(expression)
 
-    print(eqn)
+    # print(eqn[0])
 
-    return sym.solve(eqn, p)
+    return solve(eqn, *p)
 
 
 def subpixel_offset(num_images, ref_index, squared_size):
@@ -149,23 +158,56 @@ def subpixel_offset(num_images, ref_index, squared_size):
     return x, y
 
 
-for i in range(0, np.shape(image)[1]):
-    for j in range(0, np.shape(image)[2]):
-        for t in range(0, num_images):
+def multilooking(num_images, folder, bands_list):
 
-            image_index, offset_i, offset_j = pixel_positions(
-                t, index_array, num_images)
+    folder = "C://Users//adeju//Coding//Multilooking_Zanotta//examples//exp3_real//dados_teste_1"
+    arr = listdir(folder)
 
-            X = lin_sis_solve(image[image_index, i+offset_i, j+offset_j])
+    try:
+        if isinstance(bands_list, list):
+            dataset = rt.open(arr[0])
+            image = dataset.read()
+            bands_list = np.uint(bands_list)
+        else:
+            dataset = rt.open(arr[0])
+            image = dataset.read()
+            # image = np.moveaxis(image, 0, -1)
+            bands_list = list(range(np.shape(image)[2]))
+    except Exception as e:
+        print(e)
 
-            X = np.reshape(X, (int(np.sqrt(X)), int(np.sqrt(X))))
+    bands_list = [1]
 
-            # offsets
-            tile_size_offset = int(np.shape(X)[0]/2)
-            tile_size_offset = int(5/2)
-            offset = subpixel_offset(num_images, 0, squared_size)
-            x = int(round(squared_size*(i + offset[0])-tile_size_offset))
-            y = int(round(squared_size*(j + offset[0]))-tile_size_offset)
+    for b in bands_list:
+        num_images = np.size(arr)
+        width = np.shape(image)[1]
+        height = np.shape(image)[2]
 
-            blit(image_out[t, :, :], index_array, (x, y))
+        image = np.zeros((num_images, width, height))
+        for i in range(np.size(arr)):
+            image[i, :, :] = rt.open(arr[i]).read(b)
+
+        for i in range(0, width):
+            for j in range(0, height):
+                
+                # t = 0
+
+                for t in range(0, num_images):
+    
+                    image_index, offset_i, offset_j = pixel_positions(
+                        t, index_array, num_images)
+    
+                    X = lin_sis_solve(image[image_index, i+offset_i, j+offset_j])
+                    print(X)
+    
+                    X = np.reshape(X, (int(np.sqrt(X)), int(np.sqrt(X))))
+    
+                    # offsets
+                    tile_size_offset = int(np.shape(X)[0]/2)
+                    tile_size_offset = int(5/2)
+                    offset = subpixel_offset(num_images, 0, squared_size)
+                    x = int(round(squared_size*(i + offset[0])-tile_size_offset))
+                    y = int(round(squared_size*(j + offset[0]))-tile_size_offset)
+    
+                    blit(image_out[t, :, :], index_array, (x, y))
 

@@ -7,8 +7,8 @@ Created on Wed Feb 17 15:47:16 2021
 
 
 import numpy as np
-import sympy as sym
-from sympy import *
+from sympy import Matrix, solve_linear_system, symbols
+from scipy import linalg
 import rasterio as rt
 import math
 from os import listdir
@@ -16,8 +16,9 @@ from os import listdir
 
 num_images = 9
 squared_size = int(np.sqrt(num_images))
-image = np.zeros((num_images, 500, 500), dtype=np.uint8)
-image_out = np.zeros((num_images, 3*500, 3*500), dtype=np.uint8)
+num_variables = int(math.pow((squared_size + squared_size - 1), 2))
+image = np.zeros((num_images, 500, 500), dtype=np.float64)
+image_out = np.zeros((num_images, 3*500, 3*500), dtype=np.float64)
 
 # Create index array helper
 index_array = np.reshape(list(range(9)), (3, 3))
@@ -75,13 +76,8 @@ def lin_sis_solve(im):
     # im = image[image_index, 0+offset_i, 0+offset_j]
     # im  = np.zeros(num_images)
 
-    # p = []
-    eqn = []
-
-    # for i in range(int(math.pow((squared_size + squared_size - 1), 2))):
-    #     p.append(sym.symbols('p' + str(i)))
-        
-    p = sym.symbols('p0:%d'%int(math.pow((squared_size + squared_size - 1), 2)))
+    num_variables = int(math.pow((squared_size + squared_size - 1), 2))
+    p = symbols('p0:%d' % num_variables)
 
     # Create index array helper
     im_index_array = np.reshape(list(range(np.size(im))), (squared_size, squared_size))
@@ -94,7 +90,7 @@ def lin_sis_solve(im):
             if str(np.sort((i, j))) not in im_combinations:
                 im_combinations.append(str(np.sort((i, j))))
 
-    res = []
+    matrix = []
     for combination in im_combinations:
 
         im_indexes = np.fromstring(combination[1:-1], sep=' ').astype(int)
@@ -120,31 +116,31 @@ def lin_sis_solve(im):
         A = [i for i in positive_variable_indexes if i not in negative_variable_indexes]
         B = [i for i in negative_variable_indexes if i not in positive_variable_indexes]
 
-        # Create the equation expression
+        row_variables = np.zeros(num_variables + 1, np.float64)
+
         for i in A:
-            if "expression" not in locals():
-                expression = sym.Add(p[i])
-            else:
-                expression = sym.Add(expression, p[i])
+            row_variables[i] = 1
 
         for i in B:
-            if "expression" not in locals():
-                expression = sym.Add(-p[i])
-            else:
-                expression = sym.Add(expression, -p[i])
+            row_variables[i] = -1
 
         if im_indexes[0] == im_indexes[1]:
-            result = (im[im_indexes[0]]*num_images)
-            res.append(result)
+            row_variables[-1] = (im[im_indexes[0]]*num_images)
         else:
-            result = ((im[im_indexes[0]] - im[im_indexes[1]])*num_images)
-            res.append(result)
-        eqn.append(sym.Eq(expression, result))
-        del(expression)
+            row_variables[-1] = ((im[im_indexes[0]] - im[im_indexes[1]])*num_images)
 
-    # print(eqn[0])
+        matrix.append(row_variables)
+        
+    matrix = np.asarray(matrix)
+    
+    a = matrix[:, 0:-1]
+    b = matrix[:, -1]
+    # linalg.solve(a, b)
+    x = linalg.lstsq(a, b)[0]
 
-    return solve(eqn, *p)
+    # x = solve_linear_system(Matrix(np.asarray(matrix)), *p, dict=True, rational=False)
+
+    return x
 
 
 def subpixel_offset(num_images, ref_index, squared_size):
@@ -165,49 +161,62 @@ def multilooking(num_images, folder, bands_list):
 
     try:
         if isinstance(bands_list, list):
-            dataset = rt.open(arr[0])
+            dataset = rt.open(folder+"//"+arr[0])
             image = dataset.read()
             bands_list = np.uint(bands_list)
         else:
-            dataset = rt.open(arr[0])
+            dataset = rt.open(folder+"//"+arr[0])
             image = dataset.read()
             # image = np.moveaxis(image, 0, -1)
             bands_list = list(range(np.shape(image)[2]))
     except Exception as e:
         print(e)
+        
+    image_out = np.zeros((1, 3*np.shape(image)[1], 3*np.shape(image)[2]), dtype=np.float64)
 
     bands_list = [1]
 
     for b in bands_list:
+        # b = 1
         num_images = np.size(arr)
         width = np.shape(image)[1]
         height = np.shape(image)[2]
 
-        image = np.zeros((num_images, width, height))
-        for i in range(np.size(arr)):
-            image[i, :, :] = rt.open(arr[i]).read(b)
+        # image = np.zeros((num_images, width, height), dtype=np.float64)
+        # for i in range(np.size(arr)):
+        #     image[i, :, :] = rt.open(folder+"//"+arr[i]).read(b)
 
-        for i in range(0, width):
-            for j in range(0, height):
-                
-                # t = 0
+        for i in range(0, width-1):
+            for j in range(0, height-1):
+
+                 # t = 0
+                 # i = 0
+                 # j = 0
 
                 for t in range(0, num_images):
-    
                     image_index, offset_i, offset_j = pixel_positions(
                         t, index_array, num_images)
-    
-                    X = lin_sis_solve(image[image_index, i+offset_i, j+offset_j])
-                    print(X)
-    
-                    X = np.reshape(X, (int(np.sqrt(X)), int(np.sqrt(X))))
-    
-                    # offsets
-                    tile_size_offset = int(np.shape(X)[0]/2)
-                    tile_size_offset = int(5/2)
-                    offset = subpixel_offset(num_images, 0, squared_size)
-                    x = int(round(squared_size*(i + offset[0])-tile_size_offset))
-                    y = int(round(squared_size*(j + offset[0]))-tile_size_offset)
-    
-                    blit(image_out[t, :, :], index_array, (x, y))
+
+                    im = image[image_index, i+offset_i, j+offset_j]
+                    # print(image_index, im, i+offset_i, j+offset_j)
+                    X = lin_sis_solve(im)
+                    # print(X)
+                    # print('___')
+
+                    X = np.reshape(X, (int(np.sqrt(num_variables)), int(np.sqrt(num_variables))))
+
+                    # # offsets
+                    # tile_size_offset = int(np.shape(X)[0]/2)
+                    # tile_size_offset = int(5/2)
+                    offset = subpixel_offset(num_images, t, squared_size)
+                    # print(offset)
+                    x = int(round(squared_size*i + offset[0]*squared_size))
+                    y = int(round(squared_size*j + offset[1]*squared_size))
+                    # y = int(round(squared_size*(j + offset[1]))-tile_size_offset)
+                    # print(x,y)
+
+                    blit(image_out[b, :, :], X, (x, y))
+                    
+                    
+
 

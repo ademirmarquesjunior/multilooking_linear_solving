@@ -193,16 +193,39 @@ jj=j+0.33;
 img_out(round(3*ii)-2,round(3*jj)-2,n)=x(1); img_out(round(3*ii)-2,round(3*jj)-1,n)=x(2); img_out(round(3*ii)-2,round(3*jj),n)=x(3); img_out(round(3*ii)-2,round(3*jj)+1,n)=x(4); img_out(round(3*ii)-2,round(3*jj)+2,n)=x(5); img_out(round(3*ii)-1,round(3*jj)-2,n)=x(6); img_out(round(3*ii)-1,round(3*jj)-1,n)=x(7); img_out(round(3*ii)-1,round(3*jj),n)=x(8); img_out(round(3*ii)-1,round(3*jj)+1,n)=x(9); img_out(round(3*ii)-1,round(3*jj)+2,n)=x(10);
 img_out(round(3*ii),round(3*jj)-2,n)=x(11); img_out(round(3*ii),round(3*jj)-1,n)=x(12); img_out(round(3*ii),round(3*jj),n)=x(13); img_out(round(3*ii),round(3*jj)+1,n)=x(14); img_out(round(3*ii),round(3*jj)+2,n)=x(15); img_out(round(3*ii)+1,round(3*jj)-2,n)=x(16); img_out(round(3*ii)+1,round(3*jj)-1,n)=x(17); img_out(round(3*ii)+1,round(3*jj),n)=x(18); img_out(round(3*ii)+1,round(3*jj)+1,n)=x(19); img_out(round(3*ii)+1,round(3*jj)+2,n)=x(20);
 img_out(round(3*ii)+2,round(3*jj)-2,n)=x(21); img_out(round(3*ii)+2,round(3*jj)-1,n)=x(22); img_out(round(3*ii)+2,round(3*jj),n)=x(23); img_out(round(3*ii)+2,round(3*jj)+1,n)=x(24); img_out(round(3*ii)+2,round(3*jj)+2,n)=x(25);
+
 %%%  9  %%%
-im1=img9(i,j); im2=img7(i,j+1); im3=img8(i,j+1); im4=img3(i+1,j); im5=img1(i+1,j+1); im6=img2(i+1,j+1); im7=img6(i+1,j); im8=img4(i+1,j+1); im9=img5(i+1,j+1);
-im1=double(im1); im2=double(im2); im3=double(im3); im4=double(im4); im5=double(im5); im6=double(im6); im7=double(im7); im8=double(im8); im9=double(im9);
-[x]= lin_sis_solve (im1, im2, im3, im4, im5, im6, im7, im8, im9);
-n=n+1;
-ii=i+0.66;
-jj=j+0.66;
-img_out(round(3*ii)-2,round(3*jj)-2,n)=x(1); img_out(round(3*ii)-2,round(3*jj)-1,n)=x(2); img_out(round(3*ii)-2,round(3*jj),n)=x(3); img_out(round(3*ii)-2,round(3*jj)+1,n)=x(4); img_out(round(3*ii)-2,round(3*jj)+2,n)=x(5); img_out(round(3*ii)-1,round(3*jj)-2,n)=x(6); img_out(round(3*ii)-1,round(3*jj)-1,n)=x(7); img_out(round(3*ii)-1,round(3*jj),n)=x(8); img_out(round(3*ii)-1,round(3*jj)+1,n)=x(9); img_out(round(3*ii)-1,round(3*jj)+2,n)=x(10);
-img_out(round(3*ii),round(3*jj)-2,n)=x(11); img_out(round(3*ii),round(3*jj)-1,n)=x(12); img_out(round(3*ii),round(3*jj),n)=x(13); img_out(round(3*ii),round(3*jj)+1,n)=x(14); img_out(round(3*ii),round(3*jj)+2,n)=x(15); img_out(round(3*ii)+1,round(3*jj)-2,n)=x(16); img_out(round(3*ii)+1,round(3*jj)-1,n)=x(17); img_out(round(3*ii)+1,round(3*jj),n)=x(18); img_out(round(3*ii)+1,round(3*jj)+1,n)=x(19); img_out(round(3*ii)+1,round(3*jj)+2,n)=x(20);
-img_out(round(3*ii)+2,round(3*jj)-2,n)=x(21); img_out(round(3*ii)+2,round(3*jj)-1,n)=x(22); img_out(round(3*ii)+2,round(3*jj),n)=x(23); img_out(round(3*ii)+2,round(3*jj)+1,n)=x(24); img_out(round(3*ii)+2,round(3*jj)+2,n)=x(25);
+	im1=img9(i,j); im2=img7(i,j+1); im3=img8(i,j+1); im4=img3(i+1,j); im5=img1(i+1,j+1); im6=img2(i+1,j+1); im7=img6(i+1,j); im8=img4(i+1,j+1); im9=img5(i+1,j+1);
+	im1=double(im1); im2=double(im2); im3=double(im3); im4=double(im4); im5=double(im5); im6=double(im6); im7=double(im7); im8=double(im8); im9=double(im9);
+	[x]= lin_sis_solve (im1, im2, im3, im4, im5, im6, im7, im8, im9);
+	n=n+1;
+	ii=i+0.66;
+	jj=j+0.66;
+	img_out(round(3*ii)-2,round(3*jj)-2,n)=x(1);
+	img_out(round(3*ii)-2,round(3*jj)-1,n)=x(2);
+	img_out(round(3*ii)-2,round(3*jj),n)=x(3);
+	img_out(round(3*ii)-2,round(3*jj)+1,n)=x(4);
+	img_out(round(3*ii)-2,round(3*jj)+2,n)=x(5);
+	img_out(round(3*ii)-1,round(3*jj)-2,n)=x(6);
+	img_out(round(3*ii)-1,round(3*jj)-1,n)=x(7);
+	img_out(round(3*ii)-1,round(3*jj),n)=x(8);
+	img_out(round(3*ii)-1,round(3*jj)+1,n)=x(9);
+	img_out(round(3*ii)-1,round(3*jj)+2,n)=x(10);
+	img_out(round(3*ii),round(3*jj)-2,n)=x(11);
+	img_out(round(3*ii),round(3*jj)-1,n)=x(12);
+	img_out(round(3*ii),round(3*jj),n)=x(13);
+	img_out(round(3*ii),round(3*jj)+1,n)=x(14);
+	img_out(round(3*ii),round(3*jj)+2,n)=x(15);
+	img_out(round(3*ii)+1,round(3*jj)-2,n)=x(16);
+	img_out(round(3*ii)+1,round(3*jj)-1,n)=x(17);
+	img_out(round(3*ii)+1,round(3*jj),n)=x(18);
+	img_out(round(3*ii)+1,round(3*jj)+1,n)=x(19);
+	img_out(round(3*ii)+1,round(3*jj)+2,n)=x(20);
+	img_out(round(3*ii)+2,round(3*jj)-2,n)=x(21);
+	img_out(round(3*ii)+2,round(3*jj)-1,n)=x(22);
+	img_out(round(3*ii)+2,round(3*jj),n)=x(23);
+	img_out(round(3*ii)+2,round(3*jj)+1,n)=x(24);
+	img_out(round(3*ii)+2,round(3*jj)+2,n)=x(25);
 
 end
 end

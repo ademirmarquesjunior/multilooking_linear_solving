@@ -54,6 +54,15 @@ This work is credited to the [Vizlab | X-Reality and GeoInformatics Lab](http://
 If you find our work useful in your research please consider citing one of our papers:
 
 ```bash
-To be published
+@INPROCEEDINGS{9554164,
+  author={Zanotta, Daniel Capella and Júnior, Ademir Marques and Aires, Alysson Soares and Bordin, Fabiane and Racolte, Graciela and Motta, João Gabriel and Kupssinskü, Lucas and Muller, Marianne and Horota, Rafael Kenji and Guimarães, Tainá Thomassin and Sales, Vinícius and Cazarin, Caroline Lessio and Gonzaga, Luiz and Veronez, Maurício Roberto},
+  booktitle={2021 IEEE International Geoscience and Remote Sensing Symposium IGARSS}, 
+  title={A Multi-Looking Approach for Spatial Super-Resolution on Laboratory-Based Hyperspectral Images}, 
+  year={2021},
+  volume={},
+  number={},
+  pages={3869-3872},
+  keywords={Visualization;Superresolution;Rocks;Robustness;Orbits;Spatial resolution;Tuning;Hyperspectral data;spectral mixing;super-resolution;spatial enhancing},
+  doi={10.1109/IGARSS47720.2021.9554164}}
 ```
 
